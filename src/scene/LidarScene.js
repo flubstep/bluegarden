@@ -31,11 +31,21 @@ const USED_KEYS = [
   's',
   'd'
 ];
+const OPPOSITE_KEY = {
+  'w': 's',
+  's': 'w',
+  'a': 'd',
+  'd': 'a',
+  'ArrowLeft': 'ArrowRight',
+  'ArrowRight': 'ArrowLeft',
+  'ArrowUp': 'ArrowDown',
+  'ArrowDown': 'ArrowUp'
+};
 
-const CAMERA_SPEED = 20;
-const ROTATION_SPEED = Math.PI / 2;
-const SCROLL_SPEED = 0.1;
-const POINT_SCALE = 100;
+const POINT_SCALE = 1000; // units per meter
+const CAMERA_SPEED = 2; // meters per second
+const ROTATION_SPEED = Math.PI / 2; // radians per second
+const SCROLL_SPEED = 10 / POINT_SCALE; // arbitrary
 
 const CLASS_COLORS = {
   1: MATERIAL_500.GREY, // Unclassified
@@ -76,7 +86,7 @@ class LidarScene {
       const [red, green, blue] = colorToRGB(color);
       colors.push(red, green, blue);
       vertices.push(p[0] / POINT_SCALE, p[1] / POINT_SCALE, p[2] / POINT_SCALE);
-      sizes.push(0.2);
+      sizes.push(0.01);
     });
 
     const geometry = new THREE.BufferGeometry();
@@ -99,11 +109,11 @@ class LidarScene {
 
   initialize(el) {
     const { width, height } = el.getBoundingClientRect();
-    this._camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    this._camera = new THREE.PerspectiveCamera(75, width / height, 0.001, 1000);
 
     this._camera.rotation.order = 'ZXY';
     this._camera.rotation.x = Math.PI/2;
-    this._camera.position.z = 10;
+    this._camera.position.z = 1;
 
     this._renderer.setSize(width, height);
     el.appendChild(this._renderer.domElement);
@@ -132,6 +142,9 @@ class LidarScene {
       e.preventDefault();
       e.stopPropagation();
       this._keydown[e.key] = true;
+      if (OPPOSITE_KEY[e.key]) {
+        this._keydown[OPPOSITE_KEY[e.key]] = false;
+      }
     }
   }
 
