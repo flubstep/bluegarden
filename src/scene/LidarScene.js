@@ -42,8 +42,8 @@ const OPPOSITE_KEY = {
   'ArrowDown': 'ArrowUp'
 };
 
-const POINT_SCALE = 1000; // units per meter
-const CAMERA_SPEED = 2; // meters per second
+const POINT_SCALE = 1; // units per meter
+const CAMERA_SPEED = 2000; // mm per second
 const ROTATION_SPEED = Math.PI / 2; // radians per second
 const SCROLL_SPEED = 10 / POINT_SCALE; // arbitrary
 
@@ -107,13 +107,80 @@ class LidarScene {
     console.log(`Loaded ${N} points.`);
   }
 
+  addDataFromBuffer(data) {
+    this.addPointsFromBuffer(data.points);
+    this.addLinesFromBuffer(data.lines);
+    this.addTrianglesFromBuffer(data.triangles);
+  }
+
+  addPointsFromBuffer(points) {
+    const N = points.size.length;
+    const geometry = new THREE.BufferGeometry();
+    geometry.addAttribute('position', new THREE.Float32BufferAttribute(points.position, 3));
+    geometry.addAttribute('color', new THREE.Float32BufferAttribute(points.color, 3));
+    geometry.addAttribute('size', new THREE.Float32BufferAttribute(points.size.map(x => 20), 1));
+    const shaderMaterial = new THREE.ShaderMaterial( {
+      vertexShader:   vertexShader,
+      fragmentShader: fragmentShader,
+      blending:       THREE.AdditiveBlending,
+      depthTest:      false,
+      transparent:    true,
+      vertexColors:   true
+    });
+    const mesh = new THREE.Points(geometry, shaderMaterial);
+    this._scene.add(mesh);
+    console.log(`Loaded ${N} points from point cloud.`);
+  }
+
+  addLinesFromBuffer(lines = null) {
+    if (!lines) {
+      return;
+    }
+    const N = lines.position.length / 6;
+    const geometry = new THREE.BufferGeometry();
+    geometry.addAttribute('position', new THREE.Float32BufferAttribute(lines.position, 3));
+    const material = new THREE.LineBasicMaterial({ color: 0xff00ff });
+    const mesh = new THREE.LineSegments(geometry, material);
+    this._scene.add(mesh);
+    console.log(`Loaded ${N} line segments from data.`);
+  }
+
+  addTrianglesFromBuffer(triangles = null) {
+    if (!triangles) {
+      return;
+    }
+    const N = triangles.position.length / 3;
+    const geometry = new THREE.BufferGeometry();
+    geometry.addAttribute('position', new THREE.Float32BufferAttribute(triangles.position, 3));
+    if (triangles.color) {
+      geometry.addAttribute('color', new THREE.Float32BufferAttribute(triangles.color, 3));
+    }
+    const material = new THREE.MeshBasicMaterial({
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.5,
+      vertexColors: THREE.VertexColors
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    this._scene.add(mesh);
+
+    const outlineMaterial = new THREE.MeshBasicMaterial({
+      color: 0x777777,
+      wireframe: true
+    });
+    const outline = new THREE.Mesh(geometry, outlineMaterial);
+    this._scene.add(outline);
+
+    console.log(`Loaded ${N} triangles from data.`)
+  }
+
   initialize(el) {
     const { width, height } = el.getBoundingClientRect();
-    this._camera = new THREE.PerspectiveCamera(75, width / height, 0.001, 1000);
+    this._camera = new THREE.PerspectiveCamera(75, width / height, 1, 1000000);
 
     this._camera.rotation.order = 'ZXY';
     this._camera.rotation.x = Math.PI/2;
-    this._camera.position.z = 1;
+    this._camera.position.z = 1000;
 
     this._renderer.setSize(width, height);
     el.appendChild(this._renderer.domElement);

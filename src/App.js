@@ -3,7 +3,8 @@ import LidarScene from './scene/LidarScene';
 
 import './App.css';
 
-const TEST_JSON_URL = '/data/1815.sample2.json';
+//const TEST_JSON_URL = '/data/1815.linecompressed.json';
+const TEST_JSON_URL = '/data/1815.buffered.json';
 
 class App extends Component {
 
@@ -15,9 +16,13 @@ class App extends Component {
   }
 
   async loadPointsFromUrl(url) {
+    console.time('network data from url');
     const response = await fetch(url);
     const data = await response.json();
-    this.scene.addPointsFromData(data);
+    console.timeEnd('network data from url');
+    console.time('add points to buffer');
+    this.scene.addDataFromBuffer(data);
+    console.timeEnd('add points to buffer');
   }
 
   render() {
