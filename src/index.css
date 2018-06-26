@@ -8,6 +8,8 @@ body {
     text-align: center;
     width: 120px;
     padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
     background-color: #388e3c;
     color: white;
 }
@@ -22,4 +24,9 @@ body {
 
 .btn.disabled:hover {
     cursor: auto;
+}
+
+.btn.small {
+    font-size: 12px;
+    width: 80px;
 }

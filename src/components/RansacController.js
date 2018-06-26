@@ -12,6 +12,10 @@ export default class RansacController extends Component {
     };
   }
 
+  getDebugger() {
+    return this.props.scene && this.props.scene._ransacDebugger;
+  }
+
   async runRansac() {
     if (!this.props.scene) {
       return;
@@ -19,9 +23,30 @@ export default class RansacController extends Component {
     if (this.state.running) {
       return;
     }
-    this.setState({ running: true });
-    const lastResult = await this.props.scene.runRansacLive();
-    this.setState({ running: false, lastResult });
+    this.setState({
+      mode: 'inliers',
+      running: true
+    });
+    this.getDebugger().showInliers();
+    const lastResult = await this.getDebugger().runRansacLive();
+    this.setState({
+      running: false,
+      mode: 'inliers',
+      lastResult
+    });
+  }
+
+  toggleView() {
+    if (!this.props.scene) {
+      return;
+    }
+    if (this.state.mode === 'outliers') {
+      this.getDebugger().showInliers();
+      this.setState({ mode: 'inliers' });
+    } else {
+      this.getDebugger().showOutliers();
+      this.setState({ mode: 'outliers' });
+    }
   }
 
   render() {
@@ -44,6 +69,12 @@ export default class RansacController extends Component {
               <h2>Last RANSAC Run</h2>
               <div>Inlier points: {this.state.lastResult.inliers.length}</div>
               <div>Remaining outliers: {this.state.lastResult.outliers.length}</div>
+              { !this.state.running && (
+                  <div className="btn small" onClick={() => this.toggleView()}>
+                    Show { this.state.mode === 'inliers' ? 'Outliers' : 'Inliers' }
+                  </div>
+                )
+              }
             </div>
           ) : null
         }
