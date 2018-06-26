@@ -16,6 +16,9 @@ export default class RansacController extends Component {
     if (!this.props.scene) {
       return;
     }
+    if (this.state.running) {
+      return;
+    }
     this.setState({ running: true });
     const lastResult = await this.props.scene.runRansacLive();
     this.setState({ running: false, lastResult });
