@@ -12,6 +12,7 @@ class App extends Component {
   constructor(props, context) {
     super(props, context);
     this.scene = new LidarScene();
+    window.scene = this.scene;
   }
 
   componentDidMount() {

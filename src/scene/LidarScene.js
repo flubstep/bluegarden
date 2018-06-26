@@ -181,8 +181,8 @@ class LidarScene {
     this._camera = new THREE.PerspectiveCamera(75, width / height, 1, 1000000);
 
     this._camera.rotation.order = 'ZXY';
-    this._camera.rotation.x = Math.PI/2;
-    this._camera.position.z = 1000;
+    this._camera.rotation.set(0.7901105523778339, 0, -1.2283627275536086);
+    this._camera.position.set(-4855.605578556025, -887.1846993704902, 4200);
 
     this._renderer.setSize(width, height);
     el.appendChild(this._renderer.domElement);
