@@ -4,7 +4,8 @@ import LidarScene from './scene/LidarScene';
 import './App.css';
 
 //const TEST_JSON_URL = '/data/1815.linecompressed.json';
-const TEST_JSON_URL = '/data/1815.buffered.json';
+//const TEST_JSON_URL = '/data/1815.buffered.json';
+const TEST_JSON_URL = '/data/1815.small_uncompressed.json';
 
 class App extends Component {
 

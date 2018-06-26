@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import { MATERIAL_500 } from './colors';
+import RansacDebugObject from './RansacDebugObject';
 
 const vertexShader = `
   attribute float size;
@@ -118,7 +119,7 @@ class LidarScene {
     const geometry = new THREE.BufferGeometry();
     geometry.addAttribute('position', new THREE.Float32BufferAttribute(points.position, 3));
     geometry.addAttribute('color', new THREE.Float32BufferAttribute(points.color, 3));
-    geometry.addAttribute('size', new THREE.Float32BufferAttribute(points.size.map(x => 20), 1));
+    geometry.addAttribute('size', new THREE.Float32BufferAttribute(points.size.map(x => 10), 1));
     const shaderMaterial = new THREE.ShaderMaterial( {
       vertexShader:   vertexShader,
       fragmentShader: fragmentShader,
@@ -130,6 +131,7 @@ class LidarScene {
     const mesh = new THREE.Points(geometry, shaderMaterial);
     this._scene.add(mesh);
     console.log(`Loaded ${N} points from point cloud.`);
+    setImmediate(() => this.initializeRansacDebugger(points.position));
   }
 
   addLinesFromBuffer(lines = null) {
@@ -193,6 +195,20 @@ class LidarScene {
     this.render();
   }
 
+  initializeRansacDebugger(positionBuffer) {
+    const N = positionBuffer.length / 3;
+    console.time('Translating position buffer into Vector3 objects...');
+    const pointCloud = _.range(N).map(idx => {
+      const x = positionBuffer[idx * 3];
+      const y = positionBuffer[idx * 3 + 1];
+      const z = positionBuffer[idx * 3 + 2];
+      return new THREE.Vector3(x, y, z);
+    });
+    console.timeEnd('Translating position buffer into Vector3 objects...');
+    this._ransacDebugger = new RansacDebugObject(pointCloud);
+    this._ransacDebugger.addToScene(this._scene);
+  }
+
   handleVisibilityChange = (e) => {
     // Don't store keypress state if we tab away
     this._keydown = {};
@@ -212,6 +228,9 @@ class LidarScene {
       if (OPPOSITE_KEY[e.key]) {
         this._keydown[OPPOSITE_KEY[e.key]] = false;
       }
+    }
+    if (e.key === 'i' && this._ransacDebugger) {
+      this._ransacDebugger.runOneIteration();
     }
   }
 
