@@ -13,7 +13,6 @@ class App extends Component {
     this.scene = new LidarScene();
     this.scene.initialize(this.refs.sceneContainer);
     this.loadPointsFromUrl(TEST_JSON_URL);
-    window.scene = this.scene;
   }
 
   async loadPointsFromUrl(url) {
@@ -27,13 +26,15 @@ class App extends Component {
   }
 
   render() {
+    const height = window.innerHeight;
+    const width = window.innerWidth;
     return (
       <div className="App">
         <div
           ref="sceneContainer"
           style={{
-            height: 640,
-            width: 1080,
+            height: height,
+            width: width,
             backgroundColor: 'black'
           }}
         >
