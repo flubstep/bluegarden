@@ -1,16 +1,20 @@
 import React, { Component } from 'react';
+
+import RansacController from './components/RansacController';
 import LidarScene from './scene/LidarScene';
 
 import './App.css';
 
-//const TEST_JSON_URL = '/data/1815.linecompressed.json';
-//const TEST_JSON_URL = '/data/1815.buffered.json';
 const TEST_JSON_URL = '/data/1815.small_uncompressed.json';
 
 class App extends Component {
 
-  componentDidMount() {
+  constructor(props, context) {
+    super(props, context);
     this.scene = new LidarScene();
+  }
+
+  componentDidMount() {
     this.scene.initialize(this.refs.sceneContainer);
     this.loadPointsFromUrl(TEST_JSON_URL);
   }
@@ -30,6 +34,7 @@ class App extends Component {
     const width = window.innerWidth;
     return (
       <div className="App">
+        <RansacController scene={this.scene} />
         <div
           ref="sceneContainer"
           style={{

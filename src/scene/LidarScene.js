@@ -229,9 +229,6 @@ class LidarScene {
         this._keydown[OPPOSITE_KEY[e.key]] = false;
       }
     }
-    if (e.key === 'i' && this._ransacDebugger) {
-      this._ransacDebugger.runRansacLive();
-    }
   }
 
   handleKeyUp = (e) => {
@@ -274,6 +271,10 @@ class LidarScene {
     if (this._keydown['d']) {
       this._camera.position.add(LEFT);
     }
+  }
+
+  async runRansacLive() {
+    return await this._ransacDebugger.runRansacLive();
   }
 
   update(dt) {
