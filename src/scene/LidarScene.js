@@ -230,7 +230,7 @@ class LidarScene {
       }
     }
     if (e.key === 'i' && this._ransacDebugger) {
-      this._ransacDebugger.runOneIteration();
+      this._ransacDebugger.runRansacLive();
     }
   }
 

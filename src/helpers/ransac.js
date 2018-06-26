@@ -14,33 +14,6 @@ const randomSample = (collection, sampleSize) => {
   return sample;
 }
 
-const pointToLineDistances = (pointList, point1, point2) => {
-  const [x1, y1, z1] = point1;
-  const [x2, y2, z2] = point2;
-  const a = (y2 - y1);
-  const b = (x2 - x1);
-  const c = (x2*y1 - y2*x1);
-  const denominator = Math.sqrt(Math.pow(y2 - y1, 2), Math.pow(x2 - x1, 2));
-  return pointList.map(([x, y, z]) => (Math.abs(a*x - b*y + c) / denominator));
-}
-
-const ransacIteration = (pointCloud, epsilon) => {
-  // Pick two random points
-  const [p1, p2] = randomSample(pointCloud, 2);
-
-  // Draw a line between the two
-  const distances = pointToLineDistances(pointCloud, p1, p2);
-
-  // Determine how many inliers and how many outliers
-  let inliers = [];
-  pointCloud.forEach((point, idx) => {
-    if (distances[idx] <= epsilon) {
-      inliers.push(point);
-    }
-  });
-  return inliers;
-}
-
 export const ransac3D = (pointCloud, epsilon = 0.1, iterations = 500) => {
   const results = _.range(iterations).map(() => (
     ransacIteration3D(pointCloud, epsilon)
@@ -61,7 +34,8 @@ export const ransacIteration3D = (pointCloud, epsilon = 0.1) => {
   return {
     plane: [p1, p2, p3],
     inliers: inliers,
-    outliers: outliers
+    outliers: outliers,
+    score: inliers.length
   }
 }
 
@@ -72,9 +46,11 @@ const makePlanarDistanceFunction = (p1, p2, p3) => {
   v2.sub(p3);
   const cross = v1.cross(v2);
 
+  /* Just for reference, even though this is covered more efficiently below.
   const a = cross.x;
   const b = cross.y;
   const c = cross.z;
+  */
   const d = -cross.dot(p1);
 
   const dem = Math.sqrt(cross.dot(cross));
