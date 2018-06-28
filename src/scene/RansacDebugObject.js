@@ -4,7 +4,10 @@ import _ from 'lodash';
 
 import { MATERIAL_500 } from './colors';
 
-import { ransac3D, ransacIteration3D } from '../helpers/ransac';
+import { randomSample, ransac3D, ransacIteration3D } from '../helpers/ransac';
+
+const POINT_SAMPLE_SIZE = 10000;
+
 
 export default class RansacDebugObject {
 
@@ -13,10 +16,22 @@ export default class RansacDebugObject {
     this.processedPoints = [];
     this.previousInliers = [];
     this._childMeshes = {};
+    this.makeSampledPointCloud();
   }
 
   addToScene(scene) {
     this._scene = scene;
+  }
+
+  makeSampledPointCloud() {
+    if (!POINT_SAMPLE_SIZE) {
+      return;
+    }
+    if (this.pointCloud.length > POINT_SAMPLE_SIZE) {
+      this.pointCloudSampled = randomSample(this.pointCloud, POINT_SAMPLE_SIZE);
+    } else {
+      this.pointCloudSampled = this.pointCloud;
+    }
   }
 
   makePointsMesh(points, color, size) {
@@ -30,6 +45,7 @@ export default class RansacDebugObject {
     const { plane, inliers, outliers } = ransac3D(this.pointCloud, epsilon, iterations);
 
     this.pointCloud = outliers;
+    this.makeSampledPointCloud();
     this.processedPoints = _.concat(this.processedPoints, this.previousInliers);
     this.previousInliers = inliers;
 
@@ -90,6 +106,7 @@ export default class RansacDebugObject {
     const { plane, inliers, outliers } = await this.runRansacIteraction(epsilon, iterations)
 
     this.pointCloud = outliers;
+    this.makeSampledPointCloud();
 
     this.previousInliers = inliers;
 

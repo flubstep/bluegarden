@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const randomSample = (collection, sampleSize) => {
+export const randomSample = (collection, sampleSize) => {
   const N = collection.length;
   const seen = {};
   const sample = [];

@@ -13,11 +13,22 @@ class App extends Component {
     super(props, context);
     this.scene = new LidarScene();
     window.scene = this.scene;
+    this.state = {
+      pointsLoaded: false
+    };
   }
 
   componentDidMount() {
     this.scene.initialize(this.refs.sceneContainer);
     this.loadPointsFromUrl(TEST_JSON_URL);
+    window.addEventListener('resize', () => this.handleResize());
+  }
+
+  handleResize() {
+    this.setState({
+      height: window.innerHeight,
+      width: window.innerWidth
+    });
   }
 
   async loadPointsFromUrl(url) {
@@ -28,14 +39,20 @@ class App extends Component {
     console.time('add points to buffer');
     this.scene.addDataFromBuffer(data);
     console.timeEnd('add points to buffer');
+    this.setState({ pointsLoaded: true });
   }
 
   render() {
-    const height = window.innerHeight;
-    const width = window.innerWidth;
+    const height = this.state.height || window.innerHeight;
+    const width = this.state.width || window.innerWidth;
     return (
       <div className="App">
-        <RansacController scene={this.scene} />
+        { this.state.pointsLoaded ? (
+            <RansacController scene={this.scene} />
+          ) : (
+            <h1>Loading point cloud...</h1>
+          )
+        }
         <div
           ref="sceneContainer"
           style={{
