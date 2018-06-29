@@ -2,6 +2,9 @@ import _ from 'lodash';
 
 export const randomSample = (collection, sampleSize) => {
   const N = collection.length;
+  if (N <= sampleSize) {
+    return collection;
+  }
   const seen = {};
   const sample = [];
   while (sample.length < sampleSize) {
@@ -37,6 +40,17 @@ export const ransacIteration3D = (pointCloud, epsilon = 0.1) => {
     outliers: outliers,
     score: inliers.length
   }
+}
+
+export const filterByPlane = (pointCloud, plane, epsilon = 0.1) => {
+  const [p1, p2, p3] = plane;
+  const distanceToPlane = makePlanarDistanceFunction(p1, p2, p3);
+  const [inliers, outliers] = _.partition(pointCloud, p => (Math.abs(distanceToPlane(p)) <= epsilon));
+  return {
+    plane,
+    inliers,
+    outliers
+  };
 }
 
 const makePlanarDistanceFunction = (p1, p2, p3) => {
