@@ -46,7 +46,7 @@ const OPPOSITE_KEY = {
 const POINT_SCALE = 1; // units per meter
 const CAMERA_SPEED = 2000; // mm per second
 const ROTATION_SPEED = Math.PI / 2; // radians per second
-const SCROLL_SPEED = 10 / POINT_SCALE; // arbitrary
+const SCROLL_SPEED = 2 / POINT_SCALE; // arbitrary
 
 const CLASS_COLORS = {
   1: MATERIAL_500.GREY, // Unclassified
