@@ -45,6 +45,13 @@ class App extends Component {
   render() {
     const height = this.state.height || window.innerHeight;
     const width = this.state.width || window.innerWidth;
+    if (document.location.search.includes('demo')) {
+      return (
+        <div className="App">
+          <div ref="sceneContainer" style={{ height, width, backgroundColor: "black" }} />
+        </div>
+      );
+    }
     return (
       <div className="App">
         { this.state.pointsLoaded ? (
